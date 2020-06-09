@@ -11,24 +11,63 @@ var monday_morning      = new Date('2016-05-16T16:00:00.000'),
 ;
 
 // Open schedules for the shop
-// Two dimensions. First dimension for number of schedules and second for slice schedule.
+// Two dimensions. First dimension for number of schedules and second for range schedule.
 var schedules = {
     mon : [['08:00', '16:00']],
     tue : [['08:00', '16: 00'], ['14:00', '18:00']],
     wed : [['08:00', '16:00']],
     thu : [['08:00', '12:00'], ['14:00', '18:00']],
     fri : [['08:00', '16:00']],
-    sat : [[]],
-    sun : [[]],
+    sat : [],
+    sun : [],
 };
 
+var nextOpeningDate = function(date) {
+    // Array
+    let objDay = 
+    [monday_morning, wednesday, thursday, thursday_afternoon, friday_morning, saturday, sunday],
+    objDayName = ['monday_morning', 'wednesday', 'thursday', 'thursday_afternoon', 'friday_morning', 'saturday', 'sunday'];
+
+    // Get index of date
+    let indexOfDateInArray = objDay.findIndex(x => x === date);
+
+    console.log('indexOfDateInArray : ', indexOfDateInArray);
+
+    console.log('indexOfDateInArray : ', indexOfDateInArray);
+
+
+    // Scan other date in order
+    for (let i = indexOfDateInArray + 1; objDay[i]; i++)
+    {
+        console.log('i : ', i);
+
+        // Is the date on?
+        if (isOpenOn(objDay[i]))
+        {
+            return objDayName[i];
+        }
+
+        else {
+            console.log('Not good. next one')
+        }
+
+        if (i == 6)
+        {
+            i = -1
+        }
+    }
+}
+
 var processRangeTestingShop = function(daySchedules, date) {
+    console.log('daySchedules : ', daySchedules);
+    console.log('date : ', date);
+
     console.log('----------------- PROCESS -----------------')
     let flag = false;
 
     // Test if there are schedule stored in the day
     console.log('daySchedules : ', daySchedules)
-    if (daySchedules[0].length) {
+    if (daySchedules) {
 
         // Get right schedule day
         let schedule = daySchedules;
@@ -52,7 +91,7 @@ var processRangeTestingShop = function(daySchedules, date) {
                 flag = true;
                 console.log('GOOD')
 
-                // Hours == schedule. Ok but what about minutes. if it's closed at 16:00, it's not open à 16:15.
+                // Hours == schedule. Ok but what about minutes. if it's closed at 16:00, it's not open at 16:15.
                 if (objSchedule.actualSchedule.end[0] == objSchedule.actualDate.hours && objSchedule.actualSchedule.end[1] < objSchedule.actualDate.minutes)
                 {
                     // Not good.
@@ -80,7 +119,7 @@ var isOpenOn = function(date) {
     console.log('date.getDay()', date.getDay());
     // Are we in the right day?
     switch (date.getDay()) {
-        // 1 to 7 == Sunday to Friday
+        // 0 to 6 == Sunday to Friday
         case 0 :
             return processRangeTestingShop(schedules.sun, date);;
         break;
@@ -110,12 +149,17 @@ var isOpenOn = function(date) {
 
 
 
-
 // TESTS 
-console.log('isOpenDate FUNCTION (wednesday) TRUE : ', isOpenOn(wednesday));
+/* console.log('isOpenDate FUNCTION (wednesday) TRUE : ', isOpenOn(wednesday));
 console.log('isOpenDate FUNCTION (thursday) FALSE  : ', isOpenOn(thursday));
-console.log('isOpenDate FUNCTION (sunday) : FALSE ', isOpenOn(sunday));
+console.log('isOpenDate FUNCTION (sunday) : FALSE ', isOpenOn(sunday)); */
 
+// console.log('------ NEXT OPENING DATE :', nextOpeningDate(thursday_afternoon))
+// console.log('------ NEXT OPENING DATE :', nextOpeningDate(saturday))
+// console.log('------ NEXT OPENING DATE :', nextOpeningDate(thursday))
 
+console.log('------ NEXT OPENING DATE (friday_morning) :', nextOpeningDate(thursday_afternoon))
+console.log('------ NEXT OPENING DATE (monday_morning) :', nextOpeningDate(saturday))
+console.log('------ NEXT OPENING DATE (thursday_afternoon) :', nextOpeningDate(thursday))
 
 
