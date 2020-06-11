@@ -23,50 +23,55 @@ var schedules = {
 };
 
 var nextOpeningDate = function(date) {
+    console.log('----------------- PROCESS (nextOpeningDate) -----------------');
+    console.log('date attemp : ', date);
+
+
     // Array
-    let objDay = 
+    let arrDays = 
     [monday_morning, wednesday, thursday, thursday_afternoon, friday_morning, saturday, sunday],
-    objDayName = ['monday_morning', 'wednesday', 'thursday', 'thursday_afternoon', 'friday_morning', 'saturday', 'sunday'];
+    arrDaysName = ['monday_morning', 'wednesday', 'thursday', 'thursday_afternoon', 'friday_morning', 'saturday', 'sunday'];
 
     // Get index of date
-    let indexOfDateInArray = objDay.findIndex(x => x === date);
+    let indexOfDateInArray = arrDays.findIndex(x => x === date);
 
-    console.log('indexOfDateInArray : ', indexOfDateInArray);
+    // Check if indexOfDateInArray is in a good range for the first scan. If it's sunday. Go back on monday to allow the loop
+    if (indexOfDateInArray >= 6)
+    {
+        indexOfDateInArray = -1
+    }
 
-    console.log('indexOfDateInArray : ', indexOfDateInArray);
-
-
+    console.log('----------- Looking for opened day. -------')
     // Scan other date in order
-    for (let i = indexOfDateInArray + 1; objDay[i]; i++)
+    for (let i = indexOfDateInArray + 1; arrDays[i]; i++)
     {
         console.log('i : ', i);
-
-        // Is the date on?
-        if (isOpenOn(objDay[i]))
+        // End of array, return to first position
+        if (i >= 6)
         {
-            return objDayName[i];
+            i = 0
+        }
+
+        console.log('attemp with : ', arrDaysName[i]);
+        // Is the scanned date is open in the day?
+        if (isOpenOn(arrDays[i]))
+        {
+            return arrDaysName[i];
         }
 
         else {
             console.log('Not good. next one')
         }
-
-        if (i == 6)
-        {
-            i = -1
-        }
     }
+
+    console.log('-------------------------- END (nextOpeningDate) ----------------------------------')
+
 }
 
 var processRangeTestingShop = function(daySchedules, date) {
-    console.log('daySchedules : ', daySchedules);
-    console.log('date : ', date);
-
-    console.log('----------------- PROCESS -----------------')
     let flag = false;
 
     // Test if there are schedule stored in the day
-    console.log('daySchedules : ', daySchedules)
     if (daySchedules) {
 
         // Get right schedule day
@@ -82,14 +87,11 @@ var processRangeTestingShop = function(daySchedules, date) {
                 actualDate : {hours : date.getHours(), minutes : date.getMinutes()}
             };
 
-            console.log('objSchedule : ', objSchedule);
-
-
             // Are we in the range of actual schedule with hours?
             if (objSchedule.actualSchedule.begin[0] <= objSchedule.actualDate.hours && objSchedule.actualSchedule.end[0] >= objSchedule.actualDate.hours)
             {
                 flag = true;
-                console.log('GOOD')
+                console.log('Open this hour. Testing with minutes....')
 
                 // Hours == schedule. Ok but what about minutes. if it's closed at 16:00, it's not open at 16:15.
                 if (objSchedule.actualSchedule.end[0] == objSchedule.actualDate.hours && objSchedule.actualSchedule.end[1] < objSchedule.actualDate.minutes)
@@ -98,9 +100,12 @@ var processRangeTestingShop = function(daySchedules, date) {
                     flag = false;
                     console.log('Not Good finally because of minutes. Good time hour but late with minutes.')
                 }
+
+                else {
+                    console.log('Opened in the range. End of process')
+                }
             }
 
-            console.log('objSchedule : ', objSchedule);
         }
     }
 
@@ -115,8 +120,8 @@ var processRangeTestingShop = function(daySchedules, date) {
 
 // Function to return true if "date" matches with current timedate.
 var isOpenOn = function(date) {
+    console.log('----------------- PROCESS (isOpenOn) -----------------')
 
-    console.log('date.getDay()', date.getDay());
     // Are we in the right day?
     switch (date.getDay()) {
         // 0 to 6 == Sunday to Friday
@@ -148,18 +153,27 @@ var isOpenOn = function(date) {
 };
 
 
+// TESTS
+console.log('|-|-|-|-|-|-|-|-|-|-|-|- First Function (isOpenOn) |-|-|-|-|-|-|-|-')
+console.log('isOpenDate FUNCTION (monday_morning) : ', isOpenOn(monday_morning));
+console.log('isOpenDate FUNCTION (wednesday) : ', isOpenOn(wednesday));
+console.log('isOpenDate FUNCTION (thursday) : ', isOpenOn(thursday));
+console.log('isOpenDate FUNCTION (thursday_afternoon) : ', isOpenOn(thursday_afternoon));
+console.log('isOpenDate FUNCTION (friday_morning) : ', isOpenOn(friday_morning));
+console.log('isOpenDate FUNCTION (saturday) : ', isOpenOn(saturday));
+console.log('isOpenDate FUNCTION (sunday) : ', isOpenOn(sunday));
+console.log('|-|-|-|-|-|-|-|-|-|-|-|- End of "First Function (isOpenOn)" |-|-|-|-|-|-|-|-')
 
-// TESTS 
-/* console.log('isOpenDate FUNCTION (wednesday) TRUE : ', isOpenOn(wednesday));
-console.log('isOpenDate FUNCTION (thursday) FALSE  : ', isOpenOn(thursday));
-console.log('isOpenDate FUNCTION (sunday) : FALSE ', isOpenOn(sunday)); */
 
-// console.log('------ NEXT OPENING DATE :', nextOpeningDate(thursday_afternoon))
-// console.log('------ NEXT OPENING DATE :', nextOpeningDate(saturday))
-// console.log('------ NEXT OPENING DATE :', nextOpeningDate(thursday))
 
-console.log('------ NEXT OPENING DATE (friday_morning) :', nextOpeningDate(thursday_afternoon))
-console.log('------ NEXT OPENING DATE (monday_morning) :', nextOpeningDate(saturday))
-console.log('------ NEXT OPENING DATE (thursday_afternoon) :', nextOpeningDate(thursday))
+console.log('|-|-|-|-|-|-|-|-|-|-|-|- Second Function (nextOpeningDate) |-|-|-|-|-|-|-|-')
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE with (monday_morning) ||||||||||||||||', nextOpeningDate(monday_morning));
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE (wednesday) ||||||||||||||||', nextOpeningDate(wednesday));
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE (thursday) ||||||||||||||||', nextOpeningDate(thursday));
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE (thursday_afternoon) ||||||||||||||||', nextOpeningDate(thursday_afternoon));
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE (friday_morning) ||||||||||||||||', nextOpeningDate(friday_morning));
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE (saturday) ||||||||||||||||', nextOpeningDate(saturday));
+console.log('|||||||||||||||| RESULT  NEXT OPENING DATE (sunday) ||||||||||||||||', nextOpeningDate(sunday));
+console.log('|-|-|-|-|-|-|-|-|-|-|-|- End of "Second Function (nextOpeningDate)" |-|-|-|-|-|-|-|-')
 
 
